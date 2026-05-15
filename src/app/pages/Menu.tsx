@@ -1,0 +1,405 @@
+import { useState, useEffect, useRef, type CSSProperties } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Heart, X, Plus } from 'lucide-react';
+import { ImageWithFallback } from '../components/figma/ImageWithFallback';
+import { CREAM, CREAM_2, DARK, DARK_2, INK, SAGE, SAGE_DARK } from '../theme';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+import Logo from '../images/Logo.svg';
+import menu1 from '../images/Menu-1.jpeg';
+import menu2 from '../images/Menu-2.jpeg';
+import menu3 from '../images/Menu-3.jpeg';
+import menu4 from '../images/Menu-4.jpeg';
+
+
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+type Dish = {
+  name: string;
+  desc: string;
+  ingredients: string;
+  price: string;
+  image: string;
+};
+
+type Spread = {
+  number: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  blurb: string;
+  dishes: Dish[];
+};
+
+const spreads: Spread[] = [
+  {
+    number: '01',
+    title: 'Signature Bowls',
+    subtitle: '& Composed Salads',
+    image: menu1,
+    blurb: 'Slow-built bowls and seasonal salads — a quiet study in texture, colour, and considered nourishment.',
+    dishes: [
+      { name: 'Heirloom Grain Bowl', desc: 'Cultured greens, tahini, charred citrus.', ingredients: 'Farro, kale, tahini, blood orange, pomegranate', price: '₹495', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Forest Açaí', desc: 'Wild berries, raw honey, toasted oats.', ingredients: 'Açaí, blueberries, banana, honey, granola', price: '₹545', image: 'https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Garden Caesar', desc: 'Baby gem, sourdough crumb, aged pecorino.', ingredients: 'Baby gem, pecorino, sourdough, anchovy oil', price: '₹465', image: 'https://images.unsplash.com/photo-1551248429-40975aa4de74?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Roasted Pumpkin & Quinoa', desc: 'Pomegranate, mint, brown butter dressing.', ingredients: 'Pumpkin, quinoa, mint, pomegranate, brown butter', price: '₹485', image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80' },
+    ],
+  },
+  {
+    number: '02',
+    title: 'Wraps',
+    subtitle: '& House Sandwiches',
+    image: menu2,
+    blurb: 'Hand-pressed flatbreads and slow-fermented sourdough, layered with house proteins and seasonal greens.',
+    dishes: [
+      { name: 'Smoked Aubergine Wrap', desc: 'Whipped tahini, charred peppers, herbs.', ingredients: 'Aubergine, tahini, peppers, mint, flatbread', price: '₹425', image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Coriander Chicken Roll', desc: 'Cultured yoghurt, slow-cooked, fresh chilli.', ingredients: 'Chicken, yoghurt, coriander, green chilli', price: '₹485', image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Sourdough Avocado', desc: 'Cultured butter, sea salt, soft-boiled egg.', ingredients: 'Sourdough, avocado, butter, egg, sea salt', price: '₹395', image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=900&q=80' },
+      { name: 'House Paneer Press', desc: 'Smoked paneer, spinach, walnut pesto.', ingredients: 'Paneer, spinach, walnut, basil, sourdough', price: '₹445', image: 'https://images.unsplash.com/photo-1539252554453-80ab65ce3586?auto=format&fit=crop&w=900&q=80' },
+    ],
+  },
+  {
+    number: '03',
+    title: 'Reimagined Chaat',
+    subtitle: '& Street Classics',
+    image: menu3,
+    blurb: 'Familiar Indian flavours, refined and rebuilt — tradition treated with the precision it deserves.',
+    dishes: [
+      { name: 'Sprouted Bhel', desc: 'Puffed grains, tamarind, coriander oil.', ingredients: 'Puffed rice, sprouts, tamarind, coriander', price: '₹345', image: 'https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Quinoa Papdi', desc: 'Whipped yoghurt, pomegranate, mint.', ingredients: 'Quinoa, yoghurt, pomegranate, mint, chaat masala', price: '₹385', image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Black Chickpea Chaat', desc: 'Chaat masala, fresh ginger, lime.', ingredients: 'Black chickpea, ginger, lime, onion, coriander', price: '₹365', image: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Beetroot Tikki', desc: 'Walnut crumb, smoked yoghurt, microgreens.', ingredients: 'Beetroot, walnut, yoghurt, microgreens', price: '₹395', image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=80' },
+    ],
+  },
+  {
+    number: '04',
+    title: 'Juices, Smoothies',
+    subtitle: '& Cold-Pressed Elixirs',
+    image: menu4,
+    blurb: 'Pressed at dawn from local farms — clean, vibrant tonics composed in small, precise batches.',
+    dishes: [
+      { name: 'Morning Greens', desc: 'Spinach, cucumber, green apple, ginger.', ingredients: 'Spinach, cucumber, apple, ginger, lime', price: '₹325', image: 'https://images.unsplash.com/photo-1622597467836-f3e6707e1191?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Saffron Almond Milk', desc: 'Soaked almonds, saffron, raw honey.', ingredients: 'Almond, saffron, honey, cardamom', price: '₹345', image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Beet & Carrot Tonic', desc: 'Cold-pressed, lemon, cayenne.', ingredients: 'Beetroot, carrot, lemon, cayenne, ginger', price: '₹315', image: 'https://images.unsplash.com/photo-1610970881699-44a5587cabec?auto=format&fit=crop&w=900&q=80' },
+      { name: 'Turmeric Restorative', desc: 'Coconut, black pepper, cardamom.', ingredients: 'Turmeric, coconut milk, pepper, cardamom', price: '₹335', image: 'https://images.unsplash.com/photo-1542444459-db63c92495bb?auto=format&fit=crop&w=900&q=80' },
+    ],
+  },
+];
+
+const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+export default function Menu() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const stRef = useRef<ScrollTrigger | null>(null);
+
+  const [pageIndex, setPageIndex] = useState(0);
+  const [savedDishes, setSavedDishes] = useState<Set<string>>(new Set());
+  const [activeDish, setActiveDish] = useState<Dish | null>(null);
+
+  useEffect(() => {
+    const pages = gsap.utils.toArray('.spread-page') as HTMLElement[];
+    if (!pages.length) return;
+
+    // We set the perspective to make the 3D flip look realistic
+    gsap.set(pages, { transformOrigin: 'left center', transformStyle: 'preserve-3d' });
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top top',
+        end: () => `+=${window.innerHeight * 3}`, // 3 flips for 4 spreads
+        scrub: 1,
+        pin: true,
+        anticipatePin: 1,
+        onUpdate: (self) => {
+          const p = self.progress;
+          let idx = 0;
+          if (p < 0.25) idx = 0;
+          else if (p < 0.5) idx = 1;
+          else if (p < 0.75) idx = 2;
+          else idx = 3;
+          
+          if (idx !== pageIndex) {
+            setPageIndex(idx);
+          }
+        }
+      }
+    });
+
+    stRef.current = tl.scrollTrigger || null;
+
+    // Flip animation for each page except the last
+    pages.forEach((page, i) => {
+      if (i < pages.length - 1) {
+        tl.to(page, {
+          rotateY: -90,
+          opacity: 0,
+          scale: 0.95,
+          z: -100, // push back to look like page curling
+          duration: 1,
+          ease: 'power2.inOut',
+        }, i); // sequence perfectly based on index
+      }
+    });
+
+    return () => {
+      if (stRef.current) {
+        stRef.current.kill();
+      }
+    };
+  });
+
+  const toggleSave = (name: string) => {
+    setSavedDishes((s) => {
+      const ns = new Set(s);
+      if (ns.has(name)) ns.delete(name); else ns.add(name);
+      return ns;
+    });
+  };
+
+  const goTo = (i: number) => {
+    setPageIndex(i);
+    if (stRef.current) {
+      const st = stRef.current;
+      const progress = i / Math.max(1, spreads.length - 1);
+      const targetScroll = st.start + (st.end - st.start) * progress;
+      gsap.to(window, { scrollTo: targetScroll, duration: 1.2, ease: 'power3.inOut' });
+    }
+  };
+
+  return (
+    <div style={{ background: CREAM }} className="min-h-screen">
+      {/* HERO */}
+      <section data-tone="light" className="px-5 sm:px-8 lg:px-14 pt-32 lg:pt-40 pb-10 lg:pb-14 text-center">
+        <div className="tracking-[0.42em] uppercase mb-5" style={{ fontSize: '10px', color: SAGE_DARK }}>— The Menu</div>
+        <h1 className="font-serif" style={{ fontSize: 'clamp(40px, 6vw, 80px)', lineHeight: 1.02, color: INK, fontWeight: 300, letterSpacing: '-0.015em' }}>
+          Our <em style={{ fontStyle: 'italic' }}>Menu.</em>
+        </h1>
+        <p className="mx-auto mt-6" style={{ fontSize: '14px', lineHeight: 1.85, color: 'rgba(42,37,32,0.6)', maxWidth: '520px' }}>
+          Scroll to turn the page — every chapter shaped by the season, prepared the same morning.
+        </p>
+      </section>
+
+      {/* CHAPTER NAV */}
+      <section data-tone="light" className="px-5 sm:px-8 lg:px-14 pb-8 sticky top-[72px] z-50"
+        style={{ background: 'rgba(244,239,230,0.92)', backdropFilter: 'blur(12px)' }}>
+        <div className="max-w-[1400px] mx-auto flex items-center justify-start sm:justify-center gap-2 sm:gap-4 overflow-x-auto py-4"
+          style={{ scrollbarWidth: 'none' }}>
+          {spreads.map((s, i) => {
+            const isActive = i === pageIndex;
+            return (
+              <button key={s.number} onClick={() => goTo(i)}
+                className="flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2.5 transition-all duration-300 flex-shrink-0"
+                style={{
+                  fontSize: '10px', letterSpacing: '0.28em', textTransform: 'uppercase',
+                  color: isActive ? CREAM : INK,
+                  background: isActive ? INK : 'transparent',
+                  border: `1px solid ${isActive ? INK : 'rgba(42,37,32,0.2)'}`,
+                  borderRadius: '1px',
+                }}>
+                <span style={{ opacity: 0.6 }}>{s.number}</span>
+                <span className="whitespace-nowrap">{s.title}</span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* GSAP SCROLL-DRIVEN BOOK */}
+      <div ref={containerRef} className="relative w-full h-screen overflow-hidden bg-[var(--cream)]" style={{ perspective: '2500px' }}>
+        <div className="absolute inset-0 max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-14 py-8 flex items-center justify-center">
+          <div className="relative w-full h-full lg:h-[85vh] max-h-[900px]">
+            {spreads.map((spread, i) => {
+              return (
+                <div 
+                  key={spread.number} 
+                  className="spread-page absolute inset-0 w-full h-full shadow-[0_30px_80px_-30px_rgba(42,37,32,0.35)]" 
+                  style={{ zIndex: spreads.length - i, backfaceVisibility: 'hidden', background: CREAM }}
+                >
+                  <SpreadView 
+                    spread={spread} 
+                    saved={savedDishes} 
+                    onSave={toggleSave} 
+                    onOpen={setActiveDish} 
+                    pageIndex={i} 
+                    total={spreads.length} 
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* CLOSING */}
+      <section className="py-20 lg:py-28 text-center" style={{ background: DARK_2 }}>
+        <div className="max-w-[680px] mx-auto px-6">
+          <div className="tracking-[0.42em] uppercase mb-6" style={{ fontSize: '10px', color: SAGE }}>— A Final Note</div>
+          <p className="font-serif" style={{ fontSize: 'clamp(22px, 2.4vw, 32px)', color: CREAM, lineHeight: 1.4, fontWeight: 300 }}>
+            Our menu shifts with the season — <em style={{ fontStyle: 'italic', color: SAGE }}>arrive curious.</em>
+          </p>
+        </div>
+      </section>
+
+      {/* DISH MODAL */}
+      <AnimatePresence>
+        {activeDish && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6"
+            style={{ background: 'rgba(20,17,15,0.7)', backdropFilter: 'blur(8px)' }}
+            onClick={() => setActiveDish(null)}
+          >
+            <motion.div
+              initial={{ y: 80, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 80, opacity: 0 }}
+              transition={{ duration: 0.5, ease }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full sm:max-w-[520px] overflow-hidden"
+              style={{ background: CREAM, borderRadius: '2px 2px 0 0' }}
+            >
+              <button onClick={() => setActiveDish(null)}
+                className="absolute top-4 right-4 z-10 p-2 transition-transform active:scale-90"
+                style={{ background: 'rgba(244,239,230,0.9)', borderRadius: '50%' }}>
+                <X size={18} strokeWidth={1.4} color={INK} />
+              </button>
+              <div style={{ aspectRatio: '4/3' }} className="overflow-hidden">
+                <ImageWithFallback src={activeDish.image} alt={activeDish.name} className="w-full h-full object-cover" />
+              </div>
+              <div className="p-7 sm:p-9">
+                <div className="flex items-baseline justify-between gap-4 mb-3">
+                  <h3 className="font-serif" style={{ fontSize: '26px', color: INK, fontWeight: 300, lineHeight: 1.15 }}>{activeDish.name}</h3>
+                  <span className="font-serif flex-shrink-0" style={{ fontSize: '20px', color: SAGE_DARK }}>{activeDish.price}</span>
+                </div>
+                <p style={{ fontSize: '14px', color: 'rgba(42,37,32,0.7)', lineHeight: 1.75 }}>{activeDish.desc}</p>
+
+                <div className="mt-6 pt-6" style={{ borderTop: '1px solid rgba(42,37,32,0.12)' }}>
+                  <div className="tracking-[0.32em] uppercase mb-3" style={{ fontSize: '10px', color: SAGE_DARK }}>Ingredients</div>
+                  <p style={{ fontSize: '13px', color: 'rgba(42,37,32,0.7)', lineHeight: 1.7 }}>{activeDish.ingredients}</p>
+                </div>
+
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  className="mt-8 w-full flex items-center justify-center gap-3 py-4 tracking-[0.24em] uppercase"
+                  style={{ fontSize: '11px', background: INK, color: CREAM, border: `1px solid ${INK}`, borderRadius: '1px' }}>
+                  <Plus size={14} strokeWidth={1.6} /> Add to Order
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function SpreadView({
+  spread, saved, onSave, onOpen, pageIndex, total,
+}: {
+  spread: Spread;
+  saved: Set<string>;
+  onSave: (n: string) => void;
+  onOpen: (d: Dish) => void;
+  pageIndex: number;
+  total: number;
+}) {
+  return (
+    <div className="w-full h-full flex flex-col lg:flex-row bg-[#F4EFE6] overflow-hidden relative">
+      {/* LEFT PAGE — image */}
+      <div className="w-full lg:w-1/2 h-[35vh] lg:h-full relative overflow-hidden flex-shrink-0"
+        style={{
+          background: DARK,
+          boxShadow: '20px 0 40px -20px rgba(42,37,32,0.18)',
+          zIndex: 2,
+        }}>
+        <ImageWithFallback src={spread.image} alt={spread.title} className="w-full h-full object-cover" />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(20,17,15,0.15) 0%, rgba(20,17,15,0.6) 100%)' }} />
+        {/* subtle page-curl on the inner edge */}
+        <div className="absolute top-0 right-0 bottom-0 hidden lg:block"
+          style={{ width: '24px', background: 'linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.18) 100%)' }} />
+        <div className="absolute top-6 left-6 lg:top-10 lg:left-10 font-serif tracking-[0.42em]" style={{ fontSize: '11px', color: SAGE }}>
+          — Chapter {spread.number}
+        </div>
+        <div className="absolute bottom-6 left-6 right-6 lg:bottom-10 lg:left-10 lg:right-10">
+          <h2 className="font-serif" style={{ fontSize: 'clamp(28px, 3.6vw, 48px)', lineHeight: 1.05, color: CREAM, fontWeight: 300 }}>
+            {spread.title}<br />
+            <em style={{ fontStyle: 'italic', color: SAGE }}>{spread.subtitle}</em>
+          </h2>
+        </div>
+      </div>
+
+      {/* RIGHT PAGE — dishes */}
+      <div className="w-full lg:w-1/2 flex-1 relative px-5 sm:px-10 lg:px-14 py-7 lg:py-12 flex flex-col overflow-y-auto overscroll-contain"
+        style={{ background: CREAM_2, zIndex: 1 }}>
+        {/* subtle page-curl on the inner edge */}
+        <div className="absolute top-0 left-0 bottom-0 hidden lg:block"
+          style={{ width: '24px', background: 'linear-gradient(270deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.08) 100%)' }} />
+
+        <p className="font-serif italic mb-6 lg:mb-8 flex-shrink-0" style={{ fontSize: '15px', color: 'rgba(42,37,32,0.65)', lineHeight: 1.7, maxWidth: '420px' }}>
+          {spread.blurb}
+        </p>
+
+        <ul className="space-y-5 flex-1">
+          {spread.dishes.map((d, i) => {
+            const isSaved = saved.has(d.name);
+            return (
+              <motion.li
+                key={d.name}
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 + i * 0.05, duration: 0.5, ease }}
+                className="pb-4"
+                style={{ borderBottom: '1px solid rgba(42,37,32,0.12)' }}
+              >
+                <div className="flex items-start gap-4">
+                  <button
+                    onClick={() => onOpen(d)}
+                    className="flex-1 text-left transition-transform active:scale-[0.99]"
+                  >
+                    <div className="flex items-baseline justify-between gap-4 mb-1">
+                      <h3 className="font-serif" style={{ fontSize: '17px', color: INK, fontWeight: 400, lineHeight: 1.25 }}>{d.name}</h3>
+                      <span className="font-serif flex-shrink-0" style={{ fontSize: '15px', color: SAGE_DARK, letterSpacing: '0.04em' }}>{d.price}</span>
+                    </div>
+                    <p style={{ fontSize: '13px', color: 'rgba(42,37,32,0.65)', lineHeight: 1.65 }}>{d.desc}</p>
+                  </button>
+
+                  <motion.button
+                    whileTap={{ scale: 0.85 }}
+                    onClick={() => onSave(d.name)}
+                    className="flex-shrink-0 mt-1 p-2"
+                    aria-label="Save dish"
+                  >
+                    <motion.div
+                      animate={{ scale: isSaved ? [1, 1.3, 1] : 1 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <Heart
+                        size={18}
+                        strokeWidth={1.4}
+                        fill={isSaved ? SAGE_DARK : 'transparent'}
+                        color={isSaved ? SAGE_DARK : 'rgba(42,37,32,0.4)'}
+                      />
+                    </motion.div>
+                  </motion.button>
+                </div>
+              </motion.li>
+            );
+          })}
+        </ul>
+
+        <div className="mt-6 flex items-center justify-between flex-shrink-0">
+          <div className="font-serif tracking-[0.32em]" style={{ fontSize: '11px', color: SAGE_DARK }}>
+            — {spread.number}
+          </div>
+          <div className="tracking-[0.22em] uppercase" style={{ fontSize: '10px', color: 'rgba(42,37,32,0.5)' }}>
+            Page {pageIndex + 1} of {total}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
