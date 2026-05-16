@@ -66,6 +66,13 @@ export function SiteFooter() {
       });
     }, footer);
 
+    // Handle image loads to refresh ScrollTrigger dynamically
+    const handleImageLoad = () => ScrollTrigger.refresh();
+    const images = document.querySelectorAll('img');
+    images.forEach((img) => {
+      img.addEventListener('load', handleImageLoad);
+    });
+
     // CRITICAL: Refresh ScrollTrigger when page height changes
     const observer = new ResizeObserver(() => {
       ScrollTrigger.refresh();
@@ -75,6 +82,9 @@ export function SiteFooter() {
     return () => {
       ctx.revert();
       observer.disconnect();
+      images.forEach((img) => {
+        img.removeEventListener('load', handleImageLoad);
+      });
     };
   }, []);
 

@@ -9,7 +9,7 @@ import {
   UtensilsCrossed,
 } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
-import SubscriptionHeader from "../images/Subscription-1.JPG";
+import SubscriptionHeader from "../images/Subscription-2.JPG";
 import { CREAM, CREAM_2, DARK, DARK_2, INK, SAGE, SAGE_DARK } from '../theme';
 
 type Plan = {
