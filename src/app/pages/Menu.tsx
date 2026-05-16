@@ -97,58 +97,61 @@ export default function Menu() {
   const [savedDishes, setSavedDishes] = useState<Set<string>>(new Set());
   const [activeDish, setActiveDish] = useState<Dish | null>(null);
 
-  useEffect(() => {
-    const pages = gsap.utils.toArray('.spread-page') as HTMLElement[];
-    if (!pages.length) return;
+ useEffect(() => {
+  const pages = gsap.utils.toArray('.spread-page') as HTMLElement[];
 
-    // We set the perspective to make the 3D flip look realistic
-    gsap.set(pages, { transformOrigin: 'left center', transformStyle: 'preserve-3d' });
+  if (!pages.length) return;
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: 'top top',
-        end: () => `+=${window.innerHeight * 3}`, // 3 flips for 4 spreads
-        scrub: 1,
-        pin: true,
-        anticipatePin: 1,
-        onUpdate: (self) => {
-          const p = self.progress;
-          let idx = 0;
-          if (p < 0.25) idx = 0;
-          else if (p < 0.5) idx = 1;
-          else if (p < 0.75) idx = 2;
-          else idx = 3;
-          
-          if (idx !== pageIndex) {
-            setPageIndex(idx);
-          }
-        }
-      }
-    });
-
-    stRef.current = tl.scrollTrigger || null;
-
-    // Flip animation for each page except the last
-    pages.forEach((page, i) => {
-      if (i < pages.length - 1) {
-        tl.to(page, {
-          rotateY: -90,
-          opacity: 0,
-          scale: 0.95,
-          z: -100, // push back to look like page curling
-          duration: 1,
-          ease: 'power2.inOut',
-        }, i); // sequence perfectly based on index
-      }
-    });
-
-    return () => {
-      if (stRef.current) {
-        stRef.current.kill();
-      }
-    };
+  gsap.set(containerRef.current, {
+    perspective: 2200,
   });
+
+  gsap.set(pages, {
+    transformStyle: 'preserve-3d',
+    transformOrigin: 'left center',
+    backfaceVisibility: 'hidden',
+    position: 'absolute',
+    inset: 0,
+  });
+
+  pages.forEach((page, i) => {
+    gsap.set(page, {
+      zIndex: spreads.length - i,
+      rotateY: 0,
+      xPercent: 0,
+    });
+  });
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: containerRef.current,
+      start: 'top top',
+      end: `+=${window.innerHeight * spreads.length}`,
+      scrub: 1.2,
+      pin: true,
+      anticipatePin: 1,
+    },
+  });
+
+  pages.forEach((page, i) => {
+    if (i === pages.length - 1) return;
+
+    tl.to(
+      page,
+      {
+        rotateY: -180,
+        duration: 1,
+        ease: 'power2.inOut',
+      },
+      i
+    );
+  });
+
+  return () => {
+    tl.scrollTrigger?.kill();
+    tl.kill();
+  };
+}, []);
 
   const toggleSave = (name: string) => {
     setSavedDishes((s) => {

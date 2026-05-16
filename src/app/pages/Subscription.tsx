@@ -1,6 +1,16 @@
 import { useState, type CSSProperties } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Check, ArrowRight, ArrowLeft, CreditCard } from 'lucide-react';
+import {
+  Check,
+  ArrowRight,
+  ArrowLeft,
+  CreditCard,
+  ChefHat,
+  Truck,
+  UtensilsCrossed,
+  Calendar,
+  Sparkles,
+} from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import SubscriptionHeader from "../images/Subscription-1.JPG";
 import { CREAM, CREAM_2, DARK, DARK_2, INK, SAGE, SAGE_DARK } from '../theme';
@@ -37,14 +47,24 @@ const cards = [
   { key: 'visa', label: 'Visa Infinite', last: '9012' },
   { key: 'new', label: 'Add new card', last: '' },
 ];
-
 const inputStyle: CSSProperties = {
-  width: '100%', background: 'transparent', border: 'none',
-  borderBottom: `1px solid rgba(42,37,32,0.25)`, padding: '14px 2px',
-  fontSize: '15px', color: INK, outline: 'none', fontFamily: 'inherit',
+  width: '100%',
+  background: 'transparent',
+  border: 'none',
+  borderBottom: `1px solid rgba(42,37,32,0.25)`,
+  padding: '14px 2px',
+  fontSize: '15px',
+  color: INK,
+  outline: 'none',
+  fontFamily: 'inherit',
 };
+
 const labelStyle: CSSProperties = {
-  fontSize: '10px', letterSpacing: '0.32em', textTransform: 'uppercase', color: SAGE_DARK, marginBottom: '4px',
+  fontSize: '10px',
+  letterSpacing: '0.32em',
+  textTransform: 'uppercase',
+  color: SAGE_DARK,
+  marginBottom: '4px',
 };
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -64,19 +84,18 @@ export default function Subscription() {
   return (
     <div style={{ background: CREAM }} className="min-h-screen">
       {/* HERO — DARK with overlay image */}
-      
       <section className="relative min-h-[68vh] flex items-center overflow-hidden" style={{ background: DARK }}>
         <div className="absolute inset-0">
-        <ImageWithFallback
-  src={SubscriptionHeader}
-  alt="Subscription Header"
-  style={{
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    objectPosition: 'center',
-  }}
-/>
+          <ImageWithFallback
+            src={SubscriptionHeader}
+            alt="Subscription Header"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center',
+            }}
+          />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(20,17,15,0.55) 0%, rgba(20,17,15,0.55) 50%, rgba(20,17,15,0.96) 100%)' }} />
         </div>
         <div className="relative z-10 max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-14 w-full pt-32 lg:pt-40 pb-16 lg:pb-24 text-center">
@@ -92,52 +111,40 @@ export default function Subscription() {
           </motion.div>
         </div>
       </section>
-      
 
       {/* MAIN SPLIT */}
       <section data-tone="light" className="px-5 sm:px-8 lg:px-14 pt-10 lg:pt-16 pb-20 lg:pb-32">
         <div className="max-w-[1400px] mx-auto grid lg:grid-cols-[34%_1fr] gap-10 lg:gap-16">
           {/* LEFT — vertical step rail (mobile + desktop) */}
-          <aside
-  className="
-    fixed top-[72px] left-0 right-0 z-50
-    px-4 py-2
-    lg:sticky lg:top-[100px] lg:px-0 lg:py-0
-    lg:left-auto lg:right-auto
-    self-start
-  "
->
+          <aside className="relative w-full mb-8 lg:sticky lg:top-[100px] self-start">
             <div
- className="px-3 py-2 lg:p-8"
-  style={{
-    background: 'rgba(244,239,230,0.94)',
-    backdropFilter: 'blur(14px)',
-    borderBottom: '1px solid rgba(42,37,32,0.08)',
-    borderRadius: window.innerWidth >= 1024 ? '2px' : '18px',
-  }}
->
+              className="px-3 py-2 lg:p-8"
+              style={{
+                background: 'rgba(244,239,230,0.94)',
+                backdropFilter: 'blur(14px)',
+                borderBottom: '1px solid rgba(42,37,32,0.08)',
+                borderRadius: window.innerWidth >= 1024 ? '2px' : '18px',
+              }}
+            >
               <div className="tracking-[0.42em] uppercase mb-8" style={{ fontSize: '10px', color: SAGE_DARK }}>— Your Journey</div>
               <ol className="flex items-center justify-between lg:block lg:space-y-7">
                 {steps.map((s) => {
                   const isDone = step > s.n;
                   const isActive = step === s.n;
+
                   return (
                     <li
-  key={s.n}
-  className="
-    flex flex-col items-center text-center
-    lg:flex-row lg:text-left
-    gap-1 lg:gap-5
-    flex-1
-  "
->
+                      key={s.n}
+                      className="flex flex-col items-center text-center lg:flex-row lg:text-left gap-1 lg:gap-5 flex-1"
+                    >
                       <motion.div
                         animate={{ scale: isActive ? 1.05 : 1 }}
                         transition={{ duration: 0.4 }}
                         className="flex-shrink-0 flex items-center justify-center font-serif"
                         style={{
                           width: window.innerWidth >= 1024 ? '40px' : '28px',
-height: window.innerWidth >= 1024 ? '40px' : '28px', borderRadius: '50%',
+                          height: window.innerWidth >= 1024 ? '40px' : '28px',
+                          borderRadius: '50%',
                           border: `1px solid ${isDone || isActive ? INK : 'rgba(42,37,32,0.18)'}`,
                           background: isDone || isActive ? INK : 'transparent',
                           color: isDone || isActive ? CREAM : 'rgba(42,37,32,0.55)',
@@ -148,41 +155,40 @@ height: window.innerWidth >= 1024 ? '40px' : '28px', borderRadius: '50%',
                       </motion.div>
                       <div>
                         <div>
-  <div
-    className="hidden lg:block tracking-[0.22em] uppercase"
-    style={{
-      fontSize: '10px',
-      color: isActive ? INK : 'rgba(42,37,32,0.45)',
-    }}
-  >
-    Step {s.n}
-  </div>
+                          <div
+                            className="hidden lg:block tracking-[0.22em] uppercase"
+                            style={{
+                              fontSize: '10px',
+                              color: isActive ? INK : 'rgba(42,37,32,0.45)',
+                            }}
+                          >
+                            Step {s.n}
+                          </div>
 
-  <div
-    className="hidden lg:block"
-    style={{
-      fontSize: '14px',
-      color: isActive ? INK : 'rgba(42,37,32,0.55)',
-      marginTop: '4px',
-    }}
-  >
-    {s.label}
-  </div>
+                          <div
+                            className="hidden lg:block"
+                            style={{
+                              fontSize: '14px',
+                              color: isActive ? INK : 'rgba(42,37,32,0.55)',
+                              marginTop: '4px',
+                            }}
+                          >
+                            {s.label}
+                          </div>
 
-  {isActive && (
-    <motion.div
-      layoutId="step-pulse"
-      className="mt-1.5 hidden lg:block"
-      style={{
-        width: '24px',
-        height: '1px',
-        background: SAGE_DARK,
-      }}
-    />
-  )}
-</div>
-</div>
-
+                          {isActive && (
+                            <motion.div
+                              layoutId="step-pulse"
+                              className="mt-1.5 hidden lg:block"
+                              style={{
+                                width: '24px',
+                                height: '1px',
+                                background: SAGE_DARK,
+                              }}
+                            />
+                          )}
+                        </div>
+                      </div>
                     </li>
                   );
                 })}
@@ -209,7 +215,7 @@ height: window.innerWidth >= 1024 ? '40px' : '28px', borderRadius: '50%',
                 {step === 2 && <InfoStep info={info} setInfo={setInfo} />}
                 {step === 3 && <CardStep selectedCard={selectedCard} setSelectedCard={setSelectedCard} />}
                 {step === 4 && <BillingStep bill={bill} setBill={setBill} />}
-                {step === 5 && <ReviewStep plan={current} info={info} bill={bill} card={cards.find(c => c.key === selectedCard)!} />}
+                {step === 5 && <ReviewStep plan={current} info={info} bill={bill} card={cards.find((c) => c.key === selectedCard)!} />}
               </motion.div>
             </AnimatePresence>
 
@@ -221,9 +227,11 @@ height: window.innerWidth >= 1024 ? '40px' : '28px', borderRadius: '50%',
                 disabled={step === 1}
                 className="flex items-center gap-3 px-5 py-3.5 tracking-[0.22em] uppercase transition-all duration-300"
                 style={{
-                  fontSize: '11px', color: step === 1 ? 'rgba(42,37,32,0.3)' : INK,
+                  fontSize: '11px',
+                  color: step === 1 ? 'rgba(42,37,32,0.3)' : INK,
                   border: `1px solid ${step === 1 ? 'rgba(42,37,32,0.15)' : 'rgba(42,37,32,0.4)'}`,
-                  background: 'transparent', borderRadius: '1px',
+                  background: 'transparent',
+                  borderRadius: '1px',
                   cursor: step === 1 ? 'not-allowed' : 'pointer',
                 }}
               >
@@ -245,98 +253,183 @@ height: window.innerWidth >= 1024 ? '40px' : '28px', borderRadius: '50%',
       </section>
 
       <section
-  className="px-8 lg:px-14 py-28"
-  style={{
-    background: CREAM,
-  }}
-  data-tone="light"
->
-  <div className="max-w-[1400px] mx-auto">
-    <div className="text-center mb-20">
-      <p
-        className="uppercase tracking-[0.28em] mb-5"
+        className="px-8 lg:px-14 py-20 lg:py-24 relative overflow-hidden"
         style={{
-          color: SAGE_DARK,
-          fontSize: '11px',
+          background: CREAM,
         }}
+        data-tone="light"
       >
-        How It Works
-      </p>
+        <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(28,24,20,0.03) 0%, rgba(28,24,20,0.01) 30%, rgba(28,24,20,0.05) 100%)' }} />
+          <div style={{ position: 'absolute', left: '-10%', top: '-6%', width: '34%', height: '64%', background: 'radial-gradient(closest-side, rgba(139,149,121,0.10), transparent 60%)', filter: 'blur(56px)', opacity: 0.8 }} />
+          <div style={{ position: 'absolute', right: '-10%', bottom: '-10%', width: '34%', height: '64%', background: 'radial-gradient(closest-side, rgba(28,24,20,0.07), transparent 62%)', filter: 'blur(56px)', opacity: 0.75 }} />
+        </div>
 
-      <h2
-        className="font-serif"
-        style={{
-          color: INK,
-          fontSize: '72px',
-          lineHeight: '0.95',
-        }}
-      >
-        Simple steps to eat
-        <br />
-        better every day
-      </h2>
-    </div>
+        <div className="max-w-[1400px] mx-auto relative z-10">
+          <div className="text-center mb-14 lg:mb-16">
+            <p
+              className="uppercase tracking-[0.28em] mb-4"
+              style={{
+                color: SAGE_DARK,
+                fontSize: '11px',
+              }}
+            >
+              How It Works
+            </p>
 
-    <div className="grid lg:grid-cols-[320px_1fr] gap-16 pt-24 lg:pt-0">
-      {[
-        {
-          number: '01',
-          title: 'Choose Your Plan',
-          desc: 'Select from Silver, Gold, or Platinum nourishment rituals curated for your lifestyle.',
-        },
-        {
-          number: '02',
-          title: 'Schedule Delivery',
-          desc: 'Choose your preferred delivery cadence for effortless morning or evening nourishment.',
-        },
-        {
-          number: '03',
-          title: 'Receive Daily',
-          desc: 'Freshly prepared wellness meals arrive daily with seamless concierge-style delivery.',
-        },
-      ].map((item, index) => (
-        <div
-          key={index}
-          className="relative pt-10"
-          style={{
-            borderTop: `1px solid rgba(42,37,32,0.12)`,
-          }}
-        >
-          <div
-            className="mb-8 font-serif"
-            style={{
-              fontSize: '54px',
-              color: 'rgba(42,37,32,0.12)',
-              lineHeight: '1',
-            }}
-          >
-            {item.number}
+            <h2
+              className="font-serif mx-auto"
+              style={{
+                color: INK,
+                fontSize: 'clamp(34px, 4.8vw, 58px)',
+                lineHeight: '0.96',
+                fontWeight: 300,
+                maxWidth: '900px',
+              }}
+            >
+              Simple steps to eat
+              <br />
+              better every day
+            </h2>
           </div>
 
-          <h3
-            className="font-serif mb-5"
-            style={{
-              color: INK,
-              fontSize: '34px',
-            }}
-          >
-            {item.title}
-          </h3>
+          <div className="relative">
+            <div
+              className="hidden lg:block absolute left-[10%] right-[10%] top-10 h-px"
+              style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(28,24,20,0.14) 14%, rgba(107,117,96,0.24) 50%, rgba(28,24,20,0.14) 86%, transparent 100%)' }}
+            />
+            <div className="hidden lg:flex absolute left-[13%] right-[13%] top-[34px] items-center justify-between pointer-events-none">
+              <span style={{ width: '10px', height: '10px', borderRadius: '999px', background: SAGE, opacity: 0.42 }} />
+              <span style={{ width: '10px', height: '10px', borderRadius: '999px', background: SAGE_DARK, opacity: 0.42 }} />
+              <span style={{ width: '10px', height: '10px', borderRadius: '999px', background: SAGE, opacity: 0.42 }} />
+            </div>
 
-          <p
-            style={{
-              color: 'rgba(42,37,32,0.72)',
-              fontSize: '17px',
-              lineHeight: '1.9',
-            }}
-          >
-            {item.desc}
-          </p>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 pt-4">
+              {[
+                {
+                  number: '01',
+                  title: 'Choose Your Plan',
+                  desc: 'Select from Silver, Gold, or Platinum nourishment rituals curated for your lifestyle.',
+                  icon: ChefHat,
+                },
+                {
+                  number: '02',
+                  title: 'Schedule Delivery',
+                  desc: 'Choose your preferred delivery cadence for effortless morning or evening nourishment.',
+                  icon: Truck,
+                },
+                {
+                  number: '03',
+                  title: 'Receive Daily',
+                  desc: 'Freshly prepared wellness meals arrive daily with seamless concierge-style delivery.',
+                  icon: UtensilsCrossed,
+                },
+              ].map((item, index) => {
+                const Icon = item.icon;
+
+                return (
+                  <motion.div
+                    key={index}
+                    whileHover={{ y: -8, scale: 1.02 }}
+                    whileTap={{ y: -4, scale: 1.015 }}
+                    transition={{ duration: 0.5, ease }}
+                    className="relative overflow-hidden"
+                    style={{
+                      minHeight: '300px',
+                      padding: '24px 22px 22px',
+                      borderRadius: '14px',
+                      background: 'rgba(248,244,237,0.96)',
+                      border: '1px solid rgba(28,24,20,0.10)',
+                      boxShadow: '0 18px 34px -26px rgba(28,24,20,0.24), 0 0 0 1px rgba(255,255,255,0.4) inset',
+                      backdropFilter: 'blur(8px)',
+                      transitionProperty: 'transform, box-shadow, border-color',
+                    }}
+                  >
+                    <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(255,255,255,0.38) 0%, rgba(255,255,255,0.06) 28%, rgba(28,24,20,0.02) 100%)' }} />
+                      <div style={{ position: 'absolute', right: '-12%', top: '-18%', width: '58%', height: '72%', background: 'radial-gradient(closest-side, rgba(139,149,121,0.13), transparent 68%)', filter: 'blur(26px)', opacity: 0.7 }} />
+                    </div>
+
+                    <div className="relative z-10 flex h-full flex-col">
+                      <div className="flex items-start justify-between gap-4 mb-7">
+                        <div>
+                          <div
+                            className="font-serif"
+                            style={{
+                              fontSize: 'clamp(42px, 5.8vw, 72px)',
+                              lineHeight: 0.9,
+                              color: SAGE_DARK,
+                              opacity: 0.18,
+                              letterSpacing: '-0.04em',
+                            }}
+                          >
+                            {item.number}
+                          </div>
+                          <div
+                            className="mt-4"
+                            style={{
+                              width: '48px',
+                              height: '1px',
+                              background: `linear-gradient(90deg, ${SAGE} 0%, ${SAGE_DARK} 100%)`,
+                              opacity: 0.6,
+                            }}
+                          />
+                        </div>
+
+                        <div
+                          className="flex items-center justify-center"
+                          style={{
+                            width: '54px',
+                            height: '54px',
+                            borderRadius: '999px',
+                            background: 'rgba(28,24,20,0.035)',
+                            border: '1px solid rgba(28,24,20,0.08)',
+                          }}
+                        >
+                          <Icon size={21} strokeWidth={1.35} color={SAGE_DARK} />
+                        </div>
+                      </div>
+
+                      <h3
+                        className="font-serif"
+                        style={{
+                          color: INK,
+                          fontSize: 'clamp(22px, 2.6vw, 30px)',
+                          lineHeight: 1.08,
+                          marginBottom: '12px',
+                          fontWeight: 300,
+                        }}
+                      >
+                        {item.title}
+                      </h3>
+
+                      <p
+                        style={{
+                          color: 'rgba(28,24,20,0.74)',
+                          fontSize: '15px',
+                          lineHeight: 1.8,
+                          marginBottom: '22px',
+                          maxWidth: '27ch',
+                        }}
+                      >
+                        {item.desc}
+                      </p>
+
+                      <div className="mt-auto flex items-center justify-between gap-4 pt-5" style={{ borderTop: '1px solid rgba(28,24,20,0.08)' }}>
+                        <div style={{ fontSize: '10px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(28,24,20,0.52)' }}>
+                          Sequence
+                        </div>
+                        <div style={{ width: '32px', height: '1px', background: 'rgba(28,24,20,0.22)' }} />
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
         </div>
-      ))}
-    </div>
-  </div>
-</section>
+      </section>
+
       {/* CLOSING */}
       <section className="py-16 lg:py-24 text-center" style={{ background: DARK_2 }}>
         <div className="max-w-[680px] mx-auto px-6">

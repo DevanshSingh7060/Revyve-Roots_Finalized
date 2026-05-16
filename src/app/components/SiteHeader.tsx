@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import { User } from 'lucide-react';
 import { CREAM, INK, SAGE } from '../theme';
-import Logo from '../images/Logo.svg';
+import Logo from '../images/LOGO.png';
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [overLight, setOverLight] = useState(false);
@@ -47,16 +47,15 @@ export function SiteHeader() {
   className="transition-opacity duration-300"
 >
   <img
-    src={Logo}
-    alt="Ryvive Roots"
-    style={{
-      height: '72px',
-      width: 'auto',
-      objectFit: 'contain',
-      opacity: 0.95,
-      filter: overLight ? 'invert(0)' : 'invert(1)',
-    }}
-  />
+  src={Logo}
+  alt="Ryvive Roots"
+  style={{
+    height: '72px',
+    width: 'auto',
+    objectFit: 'contain',
+    opacity: 0.95,
+  }}
+/>
 </Link>
 
           <nav className="hidden lg:flex items-center gap-11">
