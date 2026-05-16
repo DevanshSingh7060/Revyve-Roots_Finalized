@@ -29,6 +29,7 @@ export function SiteHeader() {
   { label: 'Menu', to: '/menu' },
   { label: 'Subscription', to: '/subscription' },
   { label: 'Franchise', to: '/franchise' },
+  { label: 'Career', to: '/career' },
 ];
 
   return (
@@ -63,7 +64,8 @@ export function SiteHeader() {
               const isCurrent =
                 (item.to === '/menu' && location.pathname === '/menu') ||
                 (item.to === '/subscription' && location.pathname === '/subscription') ||
-                (item.to === '/franchise' && location.pathname === '/franchise');
+                (item.to === '/franchise' && location.pathname === '/franchise') ||
+                (item.to === '/career' && location.pathname === '/career');
               return (
                 <Link
                   key={item.label}

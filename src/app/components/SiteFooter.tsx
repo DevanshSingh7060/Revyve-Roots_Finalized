@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router';
 import { Instagram, Linkedin, Youtube, Phone } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -11,6 +12,15 @@ export function SiteFooter() {
   const footerRef = useRef<HTMLElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const imageRef = useRef<HTMLDivElement | null>(null);
+  const location = useLocation();
+
+  // Ensure ScrollTrigger gets refreshed when navigating between pages
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 150);
+    return () => clearTimeout(timeout);
+  }, [location.pathname]);
 
   useEffect(() => {
     const footer = footerRef.current;
@@ -19,65 +29,69 @@ export function SiteFooter() {
 
     if (!footer || !content || !image) return;
 
-    const isMobile = window.matchMedia('(max-width: 767px)').matches;
-    const parallaxDistance = isMobile ? 52 : 180;
-    const initialLift = isMobile ? -18 : -64;
-    const depthScale = isMobile ? 1.06 : 1.08;
+    const isMobile = window.innerWidth < 768;
+    const yParallax = isMobile ? 10 : 20; // Increased for a highly dynamic effect
 
     const ctx = gsap.context(() => {
-      gsap.set(content, { opacity: 0, y: 28 });
-      gsap.set(image, {
-        scale: 1.04,
-        y: initialLift,
-        transformOrigin: 'center center',
-      });
+      // Initial states
+      gsap.set(content, { opacity: 0, y: 30 });
+      gsap.set(image, { transformOrigin: 'center center' });
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: footer,
-          start: 'top 90%',
-          end: 'bottom top',
-          scrub: isMobile ? 1.35 : 1.05,
-          anticipatePin: 1,
-        },
-      });
+      // Smooth parallax: classic translateY + gentle scale
+      gsap.fromTo(image, 
+        { yPercent: -yParallax, scale: 1.0 },
+        {
+          yPercent: yParallax,
+          scale: 1.08,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: footer,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 1.2, // Adds buttery smooth lag for premium cinematic feel
+          }
+        }
+      );
 
-      tl.to(image, {
-        y: parallaxDistance,
-        scale: depthScale,
-        ease: 'none',
-      }, 0);
-
-      tl.to(image, {
-        y: parallaxDistance * 1.08,
-        scale: isMobile ? 1.065 : 1.09,
-        ease: 'none',
-      }, 0.52);
-
-      tl.to(content, {
+      // Fade in content as footer enters view
+      gsap.to(content, {
         opacity: 1,
         y: 0,
-        duration: 0.72,
-        ease: 'power2.out',
-      }, 0.12);
+        duration: 1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: footer,
+          start: 'top 85%',
+        }
+      });
     }, footer);
 
-    return () => ctx.revert();
+    // CRITICAL: Refresh ScrollTrigger when page height changes
+    const observer = new ResizeObserver(() => {
+      ScrollTrigger.refresh();
+    });
+    observer.observe(document.body);
+
+    return () => {
+      ctx.revert();
+      observer.disconnect();
+    };
   }, []);
 
   return (
     <footer ref={footerRef} data-tone="light" className="relative overflow-hidden">
       <div className="absolute inset-0 bg-[#0f0c0a]" />
+      {/* Oversized Image Container for Strong Parallax */}
       <div
         ref={imageRef}
-        className="absolute inset-0"
+        className="absolute left-0 right-0 w-full"
         style={{
+          top: '-35%',
+          bottom: '-35%',
           backgroundImage: `url(${footerImage})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center center',
+          backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed',
-          transform: 'translate3d(0, 0, 0)',
           willChange: 'transform',
         }}
       />

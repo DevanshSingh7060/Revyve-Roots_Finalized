@@ -4,12 +4,9 @@ import {
   Check,
   ArrowRight,
   ArrowLeft,
-  CreditCard,
   ChefHat,
   Truck,
   UtensilsCrossed,
-  Calendar,
-  Sparkles,
 } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import SubscriptionHeader from "../images/Subscription-1.JPG";
@@ -26,27 +23,27 @@ type Plan = {
 };
 
 const plans: Plan[] = [
-  { key: 'essentials', name: 'Essentials', tagline: 'A gentle introduction.', meals: '14 meals weekly', price: 8999,
-    features: ['Two meals daily', 'Seasonal menu', 'Concierge support'] },
-  { key: 'balance', name: 'Balance', tagline: 'Our most chosen plan.', meals: '21 meals weekly', price: 12499, popular: true,
-    features: ['Three meals daily', 'Priority chef access', 'Cold-pressed elixirs', 'Personal nutritionist'] },
-  { key: 'complete', name: 'Complete', tagline: 'A devoted ritual.', meals: '28 meals weekly', price: 15999,
-    features: ['Four meals daily', 'Bespoke menu design', 'Private tastings', 'Wellness consultations'] },
+  {
+    key: 'essentials', name: 'Essentials', tagline: 'A gentle introduction.', meals: '14 meals weekly', price: 8999,
+    features: ['Two meals daily', 'Seasonal menu', 'Concierge support']
+  },
+  {
+    key: 'balance', name: 'Balance', tagline: 'Our most chosen plan.', meals: '21 meals weekly', price: 12499, popular: true,
+    features: ['Three meals daily', 'Priority chef access', 'Cold-pressed elixirs', 'Personal nutritionist']
+  },
+  {
+    key: 'complete', name: 'Complete', tagline: 'A devoted ritual.', meals: '28 meals weekly', price: 15999,
+    features: ['Four meals daily', 'Bespoke menu design', 'Private tastings', 'Wellness consultations']
+  },
 ];
 
 const steps = [
   { n: 1, label: 'Plan Selection' },
   { n: 2, label: 'Your Information' },
-  { n: 3, label: 'Card Selection' },
-  { n: 4, label: 'Billing & Shipping' },
-  { n: 5, label: 'Review' },
+  { n: 3, label: 'Delivery Details' },
+  { n: 4, label: 'Review' },
 ];
 
-const cards = [
-  { key: 'amex', label: 'Amex Platinum', last: '4821' },
-  { key: 'visa', label: 'Visa Infinite', last: '9012' },
-  { key: 'new', label: 'Add new card', last: '' },
-];
 const inputStyle: CSSProperties = {
   width: '100%',
   background: 'transparent',
@@ -57,6 +54,13 @@ const inputStyle: CSSProperties = {
   color: INK,
   outline: 'none',
   fontFamily: 'inherit',
+  transition: 'border-color 0.3s ease',
+};
+
+const selectStyle: CSSProperties = {
+  ...inputStyle,
+  appearance: 'none',
+  cursor: 'pointer',
 };
 
 const labelStyle: CSSProperties = {
@@ -65,6 +69,7 @@ const labelStyle: CSSProperties = {
   textTransform: 'uppercase',
   color: SAGE_DARK,
   marginBottom: '4px',
+  display: 'block',
 };
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -72,13 +77,31 @@ const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 export default function Subscription() {
   const [step, setStep] = useState(1);
   const [selectedPlan, setSelectedPlan] = useState('balance');
-  const [selectedCard, setSelectedCard] = useState('amex');
-  const [info, setInfo] = useState({ name: '', email: '', phone: '' });
-  const [bill, setBill] = useState({ address: '', city: '', pincode: '' });
+
+  const [info, setInfo] = useState({
+    firstName: '',
+    lastName: '',
+    phone: '',
+    email: '',
+    dob: '',
+    allergies: '',
+    conditions: ''
+  });
+
+  const [delivery, setDelivery] = useState({
+    pincode: '',
+    house: '',
+    street: '',
+    landmark: '',
+    morningSlot: '',
+    eveningSlot: ''
+  });
+
+  const [agreed, setAgreed] = useState(false);
 
   const current = plans.find((p) => p.key === selectedPlan)!;
 
-  const next = () => setStep((s) => Math.min(5, s + 1));
+  const next = () => setStep((s) => Math.min(4, s + 1));
   const back = () => setStep((s) => Math.max(1, s - 1));
 
   return (
@@ -194,7 +217,7 @@ export default function Subscription() {
                 })}
               </ol>
 
-              <div className="font-serif" style={{ fontSize: '24px', color: INK, fontWeight: 300 }}>{current.name}</div>
+              <div className="font-serif mt-10" style={{ fontSize: '24px', color: INK, fontWeight: 300 }}>{current.name}</div>
               <div style={{ fontSize: '12px', color: 'rgba(42,37,32,0.6)', marginTop: '4px' }}>
                 ₹{current.price.toLocaleString('en-IN')} / month
               </div>
@@ -213,9 +236,8 @@ export default function Subscription() {
               >
                 {step === 1 && <PlanStep selectedPlan={selectedPlan} setSelectedPlan={setSelectedPlan} />}
                 {step === 2 && <InfoStep info={info} setInfo={setInfo} />}
-                {step === 3 && <CardStep selectedCard={selectedCard} setSelectedCard={setSelectedCard} />}
-                {step === 4 && <BillingStep bill={bill} setBill={setBill} />}
-                {step === 5 && <ReviewStep plan={current} info={info} bill={bill} card={cards.find((c) => c.key === selectedCard)!} />}
+                {step === 3 && <DeliveryStep delivery={delivery} setDelivery={setDelivery} />}
+                {step === 4 && <ReviewStep plan={current} info={info} delivery={delivery} agreed={agreed} setAgreed={setAgreed} />}
               </motion.div>
             </AnimatePresence>
 
@@ -239,13 +261,21 @@ export default function Subscription() {
               </motion.button>
 
               <motion.button
-                whileTap={{ scale: 0.97 }}
-                whileHover={{ scale: 1.02 }}
-                onClick={step === 5 ? () => alert('Membership confirmed') : next}
+                whileTap={{ scale: step === 4 && !agreed ? 1 : 0.97 }}
+                whileHover={{ scale: step === 4 && !agreed ? 1 : 1.02 }}
+                onClick={step === 4 ? () => alert('Subscription confirmed') : next}
+                disabled={step === 4 && !agreed}
                 className="flex items-center gap-3 px-7 sm:px-9 py-3.5 tracking-[0.22em] uppercase transition-all duration-300"
-                style={{ fontSize: '11px', background: INK, color: CREAM, border: `1px solid ${INK}`, borderRadius: '1px' }}
+                style={{
+                  fontSize: '11px',
+                  background: (step === 4 && !agreed) ? 'rgba(42,37,32,0.5)' : INK,
+                  color: CREAM,
+                  border: `1px solid ${(step === 4 && !agreed) ? 'rgba(42,37,32,0)' : INK}`,
+                  borderRadius: '1px',
+                  cursor: (step === 4 && !agreed) ? 'not-allowed' : 'pointer'
+                }}
               >
-                {step === 5 ? 'Confirm Membership' : 'Continue'} <ArrowRight size={14} strokeWidth={1.4} />
+                {step === 4 ? 'Confirm Subscription' : 'Continue'} <ArrowRight size={14} strokeWidth={1.4} />
               </motion.button>
             </div>
           </main>
@@ -537,7 +567,10 @@ function PlanStep({ selectedPlan, setSelectedPlan }: { selectedPlan: string; set
 }
 
 /* — Step 2 — */
-function InfoStep({ info, setInfo }: { info: { name: string; email: string; phone: string }; setInfo: (i: any) => void }) {
+function InfoStep({ info, setInfo }: { info: any; setInfo: (i: any) => void }) {
+  const onFocus = (e: React.FocusEvent<HTMLElement>) => { e.currentTarget.style.borderBottomColor = SAGE_DARK; };
+  const onBlur = (e: React.FocusEvent<HTMLElement>) => { e.currentTarget.style.borderBottomColor = 'rgba(42,37,32,0.25)'; };
+
   return (
     <div>
       <h2 className="font-serif mb-3" style={{ fontSize: 'clamp(28px, 3.4vw, 40px)', color: INK, fontWeight: 300, lineHeight: 1.1 }}>
@@ -547,17 +580,33 @@ function InfoStep({ info, setInfo }: { info: { name: string; email: string; phon
         So we know who to take care of.
       </p>
       <div className="grid sm:grid-cols-2 gap-x-10 gap-y-8">
+        <div>
+          <label style={labelStyle}>First Name</label>
+          <input value={info.firstName} onChange={(e) => setInfo({ ...info, firstName: e.target.value })} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
+        </div>
+        <div>
+          <label style={labelStyle}>Last Name</label>
+          <input value={info.lastName} onChange={(e) => setInfo({ ...info, lastName: e.target.value })} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
+        </div>
+        <div>
+          <label style={labelStyle}>Phone Number</label>
+          <input type="tel" value={info.phone} onChange={(e) => setInfo({ ...info, phone: e.target.value })} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
+        </div>
+        <div>
+          <label style={labelStyle}>Email ID</label>
+          <input type="email" value={info.email} onChange={(e) => setInfo({ ...info, email: e.target.value })} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
+        </div>
+        <div>
+          <label style={labelStyle}>Date of Birth</label>
+          <input type="date" value={info.dob} onChange={(e) => setInfo({ ...info, dob: e.target.value })} style={{ ...inputStyle, color: info.dob ? INK : 'rgba(42,37,32,0.5)' }} onFocus={onFocus} onBlur={onBlur} />
+        </div>
+        <div>
+          <label style={labelStyle}>Allergies (If any)</label>
+          <input value={info.allergies} onChange={(e) => setInfo({ ...info, allergies: e.target.value })} placeholder="e.g. Peanuts, Dairy" style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
+        </div>
         <div className="sm:col-span-2">
-          <div style={labelStyle}>Full Name</div>
-          <input value={info.name} onChange={(e) => setInfo({ ...info, name: e.target.value })} style={inputStyle} />
-        </div>
-        <div>
-          <div style={labelStyle}>Email</div>
-          <input type="email" value={info.email} onChange={(e) => setInfo({ ...info, email: e.target.value })} style={inputStyle} />
-        </div>
-        <div>
-          <div style={labelStyle}>Phone</div>
-          <input value={info.phone} onChange={(e) => setInfo({ ...info, phone: e.target.value })} style={inputStyle} />
+          <label style={labelStyle}>Medical Conditions</label>
+          <textarea rows={3} value={info.conditions} onChange={(e) => setInfo({ ...info, conditions: e.target.value })} placeholder="Please mention any medical conditions we should be aware of..." style={{ ...inputStyle, resize: 'none', paddingTop: '10px' }} onFocus={onFocus} onBlur={onBlur} />
         </div>
       </div>
     </div>
@@ -565,100 +614,210 @@ function InfoStep({ info, setInfo }: { info: { name: string; email: string; phon
 }
 
 /* — Step 3 — */
-function CardStep({ selectedCard, setSelectedCard }: { selectedCard: string; setSelectedCard: (k: string) => void }) {
-  return (
-    <div>
-      <h2 className="font-serif mb-3" style={{ fontSize: 'clamp(28px, 3.4vw, 40px)', color: INK, fontWeight: 300, lineHeight: 1.1 }}>
-        Choose a <em style={{ fontStyle: 'italic' }}>card.</em>
-      </h2>
-      <p className="mb-10" style={{ fontSize: '14px', color: 'rgba(42,37,32,0.65)', lineHeight: 1.8 }}>
-        Select a saved card or add a new one.
-      </p>
-      <div className="space-y-4">
-        {cards.map((c, i) => {
-          const isSel = selectedCard === c.key;
-          return (
-            <motion.button
-              key={c.key} type="button" onClick={() => setSelectedCard(c.key)}
-              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08, duration: 0.5, ease }}
-              whileTap={{ scale: 0.99 }}
-              className="w-full flex items-center justify-between gap-5 p-6 transition-all duration-300 text-left"
-              style={{
-                background: isSel ? INK : CREAM_2, color: isSel ? CREAM : INK,
-                border: `1px solid ${isSel ? INK : 'rgba(42,37,32,0.12)'}`,
-                borderRadius: '2px',
-              }}>
-              <div className="flex items-center gap-5">
-                <CreditCard size={22} strokeWidth={1.3} style={{ color: isSel ? SAGE : SAGE_DARK }} />
-                <div>
-                  <div className="font-serif" style={{ fontSize: '18px', fontWeight: 400 }}>{c.label}</div>
-                  {c.last && <div className="mt-1" style={{ fontSize: '12px', opacity: 0.6, letterSpacing: '0.18em' }}>•••• {c.last}</div>}
-                </div>
-              </div>
-              <div className="flex-shrink-0 flex items-center justify-center"
-                style={{ width: '24px', height: '24px', borderRadius: '50%', border: `1px solid ${isSel ? SAGE : 'rgba(42,37,32,0.3)'}`, background: isSel ? SAGE : 'transparent' }}>
-                {isSel && <Check size={14} strokeWidth={2} color={DARK_2} />}
-              </div>
-            </motion.button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
+function DeliveryStep({ delivery, setDelivery }: { delivery: any; setDelivery: (d: any) => void }) {
+  const onFocus = (e: React.FocusEvent<HTMLElement>) => { e.currentTarget.style.borderBottomColor = SAGE_DARK; };
+  const onBlur = (e: React.FocusEvent<HTMLElement>) => { e.currentTarget.style.borderBottomColor = 'rgba(42,37,32,0.25)'; };
 
-/* — Step 4 — */
-function BillingStep({ bill, setBill }: { bill: { address: string; city: string; pincode: string }; setBill: (b: any) => void }) {
   return (
     <div>
       <h2 className="font-serif mb-3" style={{ fontSize: 'clamp(28px, 3.4vw, 40px)', color: INK, fontWeight: 300, lineHeight: 1.1 }}>
-        Billing & <em style={{ fontStyle: 'italic' }}>shipping.</em>
+        Delivery <em style={{ fontStyle: 'italic' }}>details.</em>
       </h2>
       <p className="mb-10" style={{ fontSize: '14px', color: 'rgba(42,37,32,0.65)', lineHeight: 1.8 }}>
-        Where shall we send your daily ritual?
+        Where and when shall we send your daily ritual?
       </p>
       <div className="grid sm:grid-cols-2 gap-x-10 gap-y-8">
-        <div className="sm:col-span-2">
-          <div style={labelStyle}>Address</div>
-          <input value={bill.address} onChange={(e) => setBill({ ...bill, address: e.target.value })} style={inputStyle} />
+        <div>
+          <label style={labelStyle}>Pincode</label>
+          <input value={delivery.pincode} onChange={(e) => setDelivery({ ...delivery, pincode: e.target.value })} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
         </div>
         <div>
-          <div style={labelStyle}>City</div>
-          <input value={bill.city} onChange={(e) => setBill({ ...bill, city: e.target.value })} style={inputStyle} />
+          <label style={labelStyle}>House / Flat No.</label>
+          <input value={delivery.house} onChange={(e) => setDelivery({ ...delivery, house: e.target.value })} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
         </div>
         <div>
-          <div style={labelStyle}>Pincode</div>
-          <input value={bill.pincode} onChange={(e) => setBill({ ...bill, pincode: e.target.value })} style={inputStyle} />
+          <label style={labelStyle}>Street / Area</label>
+          <input value={delivery.street} onChange={(e) => setDelivery({ ...delivery, street: e.target.value })} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
+        </div>
+        <div>
+          <label style={labelStyle}>Landmark (Optional)</label>
+          <input value={delivery.landmark} onChange={(e) => setDelivery({ ...delivery, landmark: e.target.value })} style={inputStyle} onFocus={onFocus} onBlur={onBlur} />
+        </div>
+        <div>
+          <label style={labelStyle}>Morning Delivery Slot</label>
+          <select value={delivery.morningSlot} onChange={(e) => setDelivery({ ...delivery, morningSlot: e.target.value })} style={{ ...selectStyle, color: delivery.morningSlot ? INK : 'rgba(42,37,32,0.5)' }} onFocus={onFocus} onBlur={onBlur}>
+            <option value="" disabled>Select morning slot</option>
+            <option value="08-09 AM" style={{ color: INK }}>08:00 AM - 09:00 AM</option>
+            <option value="09-10 AM" style={{ color: INK }}>09:00 AM - 10:00 AM</option>
+            <option value="10-11 AM" style={{ color: INK }}>10:00 AM - 11:00 AM</option>
+          </select>
+        </div>
+        <div>
+          <label style={labelStyle}>Evening Delivery Slot</label>
+          <select value={delivery.eveningSlot} onChange={(e) => setDelivery({ ...delivery, eveningSlot: e.target.value })} style={{ ...selectStyle, color: delivery.eveningSlot ? INK : 'rgba(42,37,32,0.5)' }} onFocus={onFocus} onBlur={onBlur}>
+            <option value="" disabled>Select evening slot</option>
+            <option value="05-06 PM" style={{ color: INK }}>05:00 PM - 06:00 PM</option>
+            <option value="06-07 PM" style={{ color: INK }}>06:00 PM - 07:00 PM</option>
+            <option value="07-08 PM" style={{ color: INK }}>07:00 PM - 08:00 PM</option>
+            <option value="08-09 PM" style={{ color: INK }}>08:00 PM - 09:00 PM</option>
+          </select>
         </div>
       </div>
     </div>
   );
 }
 
-/* — Step 5 — */
-function ReviewStep({ plan, info, bill, card }: { plan: Plan; info: any; bill: any; card: any }) {
-  const Row = ({ label, value }: { label: string; value: string }) => (
-    <div className="flex items-baseline justify-between py-4 gap-4" style={{ borderBottom: '1px solid rgba(42,37,32,0.1)' }}>
+const reviewPlanDetails: Record<string, { desc: string; included: string[]; categories: string[]; tagline: string; name: string }> = {
+  essentials: {
+    name: 'Ryvive Essentials',
+    tagline: 'Gentle beginnings to a nourished life.',
+    desc: 'Ryvive Essentials is thoughtfully designed for those taking their first intentional steps toward better eating. With balanced, wholesome meals made from fresh ingredients, this plan offers a simple yet effective foundation for healthier habits.',
+    included: [
+      'Two balanced meals daily with seasonal ingredients',
+      'Carefully curated weekly menu',
+      'Basic concierge support',
+      'Focus on gut health and sustained energy',
+      'Nourishing staples made with care'
+    ],
+    categories: [
+      'Signature Bowls & Salads',
+      'Wraps & Sandwiches',
+      'Fresh Juices'
+    ]
+  },
+  balance: {
+    name: 'Ryvive Balance',
+    tagline: 'Harmony in every meal.',
+    desc: 'Ryvive Balance is our most chosen plan — crafted for those who seek consistency, vitality, and balance in their daily nourishment. It delivers the perfect equilibrium of flavor, nutrition, and convenience for a purposeful lifestyle.',
+    included: [
+      'Three complete meals daily',
+      'Priority chef access and customizations',
+      'Cold-pressed elixirs and functional juices',
+      'Personal nutritionist guidance',
+      'Weekly menu refinements based on your feedback'
+    ],
+    categories: [
+      'Signature Bowls & Salads',
+      'Wraps & Sandwiches',
+      'Reimagined Chaat',
+      'Juices & Smoothies',
+      'Protein-Packed Classics'
+    ]
+  },
+  complete: {
+    name: 'Ryvive Complete',
+    tagline: 'Excellence without compromise.',
+    desc: 'Ryvive Complete is created for those who desire the highest level of nourishment and personalization. Every element is meticulously curated — from ingredient sourcing to flavor pairing — delivering a truly transformative wellness experience.',
+    included: [
+      'Four meals daily with premium ingredients',
+      'Bespoke menu design tailored to your goals',
+      'Private tastings and seasonal exclusives',
+      'Wellness consultations and progress tracking',
+      'Full access to all signature offerings and functional beverages'
+    ],
+    categories: [
+      'Signature Bowls & Salads',
+      'Artisan Wraps & Pasta',
+      'Reimagined Chaat & Classics',
+      'Cold-Pressed Juices & Elixirs',
+      'Premium Desserts & Wellness Treats'
+    ]
+  }
+};
+
+/* — Step 4 — */
+function ReviewStep({ plan, info, delivery, agreed, setAgreed }: { plan: Plan; info: any; delivery: any; agreed: boolean; setAgreed: (v: boolean) => void }) {
+  const Row = ({ label, value }: { label: string; value: string | null }) => (
+    value ? <div className="flex items-baseline justify-between py-4 gap-4" style={{ borderBottom: '1px solid rgba(42,37,32,0.1)' }}>
       <div className="tracking-[0.22em] uppercase flex-shrink-0" style={{ fontSize: '10px', color: SAGE_DARK }}>{label}</div>
-      <div className="text-right" style={{ fontSize: '13px', color: INK }}>{value || '—'}</div>
-    </div>
+      <div className="text-right" style={{ fontSize: '13px', color: INK }}>{value}</div>
+    </div> : null
   );
+
+  const fullName = `${info.firstName} ${info.lastName}`.trim();
+  const address = [delivery.house, delivery.street, delivery.landmark, delivery.pincode].filter(Boolean).join(', ');
+  const details = reviewPlanDetails[plan.key];
+
   return (
     <div>
       <h2 className="font-serif mb-3" style={{ fontSize: 'clamp(28px, 3.4vw, 40px)', color: INK, fontWeight: 300, lineHeight: 1.1 }}>
-        Review your <em style={{ fontStyle: 'italic' }}>order.</em>
+        Order <em style={{ fontStyle: 'italic' }}>Summary.</em>
       </h2>
       <p className="mb-10" style={{ fontSize: '14px', color: 'rgba(42,37,32,0.65)', lineHeight: 1.8 }}>
-        A final glance before we begin.
+        A final glance before we begin your journey.
       </p>
-      <div className="p-7 lg:p-9" style={{ background: CREAM_2, borderRadius: '2px', border: '1px solid rgba(42,37,32,0.08)' }}>
-        <Row label="Plan" value={`${plan.name} — ${plan.meals}`} />
-        <Row label="Name" value={info.name} />
-        <Row label="Email" value={info.email} />
-        <Row label="Phone" value={info.phone} />
-        <Row label="Card" value={card.label + (card.last ? ` •••• ${card.last}` : '')} />
-        <Row label="Address" value={[bill.address, bill.city, bill.pincode].filter(Boolean).join(', ')} />
+
+      {/* DETAILED PLAN SUMMARY */}
+      <div className="p-7 lg:p-10 mb-8 flex flex-col gap-8" style={{ background: CREAM_2, borderRadius: '2px', border: '1px solid rgba(42,37,32,0.08)' }}>
+        <div>
+          <div className="tracking-[0.32em] uppercase mb-5" style={{ fontSize: '10px', color: SAGE_DARK }}>Your Selected Plan</div>
+          <div className="font-serif mb-2" style={{ fontSize: 'clamp(32px, 4vw, 44px)', fontWeight: 300, color: INK, letterSpacing: '0.01em' }}>
+            {details.name}
+          </div>
+          <div style={{ fontSize: '15px', color: SAGE_DARK, fontStyle: 'italic', marginBottom: '16px' }}>
+            {details.tagline}
+          </div>
+          <p style={{ fontSize: '15px', color: 'rgba(42,37,32,0.7)', lineHeight: 1.85, maxWidth: '640px' }}>
+            {details.desc}
+          </p>
+          
+          <div className="flex items-baseline gap-2 mt-8">
+            <span style={{ fontSize: '14px', opacity: 0.55 }}>₹</span>
+            <span className="font-serif" style={{ fontSize: '32px', fontWeight: 300, color: INK, letterSpacing: '-0.02em', lineHeight: 1 }}>
+              {plan.price.toLocaleString('en-IN')}
+            </span>
+            <span className="tracking-[0.24em] uppercase ml-2" style={{ fontSize: '11px', color: 'rgba(42,37,32,0.5)' }}>
+              / month · {plan.meals}
+            </span>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 pt-8" style={{ borderTop: '1px solid rgba(42,37,32,0.08)' }}>
+          <div>
+            <div className="tracking-[0.28em] uppercase mb-5" style={{ fontSize: '10px', color: SAGE_DARK }}>
+              What’s Included
+            </div>
+            <ul className="space-y-3">
+              {details.included.map((f, i) => (
+                <li key={i} className="flex items-start gap-4" style={{ fontSize: '14px', color: 'rgba(42,37,32,0.85)', lineHeight: 1.6 }}>
+                  <span style={{ color: SAGE_DARK, flexShrink: 0, marginTop: '7px', width: '4px', height: '4px', borderRadius: '50%', background: 'currentColor' }} />
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <div className="tracking-[0.28em] uppercase mb-5" style={{ fontSize: '10px', color: SAGE_DARK }}>
+              Categories Covered
+            </div>
+            <ul className="space-y-3">
+              {details.categories.map((c, i) => (
+                <li key={i} className="flex items-start gap-4" style={{ fontSize: '14px', color: 'rgba(42,37,32,0.85)', lineHeight: 1.6 }}>
+                  <span style={{ color: SAGE_DARK, flexShrink: 0, marginTop: '7px', width: '4px', height: '4px', borderRadius: '50%', background: 'currentColor' }} />
+                  {c}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* USER DETAILS */}
+      <div className="p-7 lg:p-9 mb-8" style={{ background: CREAM_2, borderRadius: '2px', border: '1px solid rgba(42,37,32,0.08)' }}>
+
+        <h3 className="tracking-[0.32em] uppercase mt-8 mb-4" style={{ fontSize: '10px', color: SAGE_DARK }}>Personal Information</h3>
+        <Row label="Name" value={fullName || '—'} />
+        <Row label="Contact" value={info.phone || info.email ? `${info.phone} | ${info.email}` : '—'} />
+        <Row label="DOB" value={info.dob || '—'} />
+        {(info.allergies || info.conditions) && (
+          <Row label="Health Info" value={[info.allergies ? `Allergies: ${info.allergies}` : null, info.conditions ? `Conditions: ${info.conditions}` : null].filter(Boolean).join(' | ')} />
+        )}
+
+        <h3 className="tracking-[0.32em] uppercase mt-8 mb-4" style={{ fontSize: '10px', color: SAGE_DARK }}>Delivery Information</h3>
+        <Row label="Address" value={address || '—'} />
+        <Row label="Morning Slot" value={delivery.morningSlot || '—'} />
+        <Row label="Evening Slot" value={delivery.eveningSlot || '—'} />
+
         <div className="flex items-baseline justify-between pt-6 mt-2">
           <div className="tracking-[0.32em] uppercase" style={{ fontSize: '11px', color: INK }}>Total / Month</div>
           <div className="font-serif" style={{ fontSize: '34px', color: INK, fontWeight: 300 }}>
@@ -666,6 +825,35 @@ function ReviewStep({ plan, info, bill, card }: { plan: Plan; info: any; bill: a
           </div>
         </div>
       </div>
+
+      <label className="flex items-start gap-4 cursor-pointer" style={{ padding: '4px 0' }}>
+        <div className="relative flex items-center justify-center mt-0.5" style={{ width: '18px', height: '18px' }}>
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+            className="absolute opacity-0 w-full h-full cursor-pointer z-10"
+          />
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              border: `1px solid ${agreed ? SAGE_DARK : 'rgba(42,37,32,0.3)'}`,
+              background: agreed ? SAGE_DARK : 'transparent',
+              borderRadius: '2px',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            {agreed && <Check size={12} strokeWidth={3} color={CREAM} />}
+          </div>
+        </div>
+        <div style={{ fontSize: '13px', color: 'rgba(42,37,32,0.8)', lineHeight: 1.6, userSelect: 'none' }}>
+          I agree to the Terms & Conditions and Privacy Policy
+        </div>
+      </label>
     </div>
   );
 }

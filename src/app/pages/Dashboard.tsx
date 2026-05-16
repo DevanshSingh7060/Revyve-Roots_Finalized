@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import gsap from 'gsap';
 import { Link } from "react-router";
 import { motion } from "motion/react";
 import {
@@ -22,7 +23,7 @@ import { CREAM, CREAM_2, DARK, INK, SAGE, SAGE_DARK } from "../theme";
 // ─── Theme Tokens ─────────────────────────────────────────────────────────────
 const GOLD = "#d4af37";
 const GOLD_LIGHT = "#fffdf0";
-const CARD_BORDER = "rgba(42,37,32,0.08)";
+const CARD_BORDER = "rgba(42,37,32,0.06)";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -256,7 +257,7 @@ const MOCK_ORDERS = [
 const MOCK_NOTIFICATIONS = [
   {
     _id: "notif_001",
-    title: "New Menu This Week 🥗",
+    title: "New Menu This Week",
     message:
       "We've added 3 new dishes to your GOLD plan this week. Check your schedule to see what's fresh!",
     createdAt: "2025-05-13T09:00:00.000Z",
@@ -349,7 +350,7 @@ function UpgradePlanCard({ plan, membershipId }: UpgradePlanProps) {
             position: "absolute",
             top: 0,
             right: 0,
-            background: `linear-gradient(135deg,${GOLD},#f4d03f)`,
+            background: GOLD,
             color: DARK,
             padding: ".3rem .9rem",
             fontSize: ".72rem",
@@ -522,7 +523,7 @@ export default function Dashboard() {
     phone: "",
     deliverySlot: "",
   });
-
+    
   // Pause modal
   const [showPauseModal, setShowPauseModal] = useState<boolean>(false);
   const [pauseFromDate, setPauseFromDate] = useState<string>("");
@@ -533,6 +534,18 @@ export default function Dashboard() {
   const [showSummary, setShowSummary] = useState<boolean>(false);
   const [renewDuration, setRenewDuration] = useState<string>("3");
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  
+  // ── Subtle mount animations for cards and sidebar
+  useEffect(() => {
+    const cards = document.querySelectorAll('.dash-card');
+    if (cards && cards.length) {
+      gsap.from(cards, { y: 14, opacity: 0, stagger: 0.05, duration: 0.75, ease: 'power2.out' });
+    }
+    const activeBtn = document.querySelector('.sidebar-btn[style*="borderLeft: 2px solid"]');
+    if (activeBtn) {
+      gsap.from(activeBtn, { opacity: 0.72, x: -4, duration: 0.45, ease: 'power2.out' });
+    }
+  }, []);
   const [calendarDate, setCalendarDate] = useState<Date>(new Date());
 
   // Load mock data on mount
@@ -836,21 +849,21 @@ export default function Dashboard() {
   // ─── Shared style helpers ────────────────────────────────────────────────────
   const card: React.CSSProperties = {
     background: CREAM,
-    borderRadius: "2px",
+    borderRadius: "4px",
     border: `1px solid ${CARD_BORDER}`,
-    boxShadow: "0 2px 12px rgba(42,37,32,0.04)",
-    marginBottom: "1.25rem",
+    boxShadow: "0 1px 8px rgba(42,37,32,0.03)",
+    marginBottom: "1.5rem",
   };
 
   const btnGold: React.CSSProperties = {
-    background: `linear-gradient(135deg,${GOLD},#f4d03f)`,
+    background: GOLD,
     color: DARK,
     border: "none",
     padding: ".65rem 1.4rem",
     fontSize: ".82rem",
-    fontWeight: 700,
+    fontWeight: 600,
     cursor: "pointer",
-    letterSpacing: "0.12em",
+    letterSpacing: "0.1em",
     textTransform: "uppercase",
   };
 
@@ -861,7 +874,7 @@ export default function Dashboard() {
     padding: ".65rem 1.4rem",
     fontSize: ".82rem",
     cursor: "pointer",
-    letterSpacing: "0.18em",
+    letterSpacing: "0.12em",
     textTransform: "uppercase",
   };
 
@@ -872,7 +885,7 @@ export default function Dashboard() {
     padding: ".65rem 1.4rem",
     fontSize: ".82rem",
     cursor: "pointer",
-    letterSpacing: "0.18em",
+    letterSpacing: "0.12em",
     textTransform: "uppercase",
   };
 
@@ -883,7 +896,7 @@ export default function Dashboard() {
     padding: ".65rem 1.4rem",
     fontSize: ".82rem",
     cursor: "not-allowed",
-    letterSpacing: "0.18em",
+    letterSpacing: "0.12em",
     textTransform: "uppercase",
   };
 
@@ -919,16 +932,16 @@ export default function Dashboard() {
   };
 
   const progressFill = (p: number): React.CSSProperties => ({
-    background: `linear-gradient(90deg,${GOLD},#f4d03f)`,
+    background: SAGE_DARK,
     height: "100%",
     width: `${p}%`,
     borderRadius: "2px",
-    transition: "width 1s ease",
+    transition: "width .9s ease",
   });
 
   const labelStyle: React.CSSProperties = {
     fontSize: "10px",
-    letterSpacing: "0.32em",
+    letterSpacing: "0.24em",
     textTransform: "uppercase",
     color: SAGE_DARK,
     fontWeight: 400,
@@ -947,7 +960,37 @@ export default function Dashboard() {
 
   // ─── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen" style={{ background: CREAM_2 }}>
+    <div className="min-h-screen dash-root" style={{ background: CREAM_2 }}>
+      <style>{`
+        /* Typography — match site-wide system */
+        .dash-root { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight:300; letter-spacing: 0.01em; color: ${INK}; }
+        .dash-root .font-serif { font-family: 'Cormorant Garamond', Georgia, serif; font-weight:300; letter-spacing: 0.005em; }
+        .dash-root h1, .dash-root h2, .dash-root h3 { margin: 0 0 0.55rem 0; }
+
+        /* Sidebar */
+        .sidebar-btn { transition: transform .28s ease, color .22s ease, opacity .22s ease; }
+        .sidebar-btn:hover { transform: translateX(3px); color: ${CREAM} !important; opacity: 1; }
+        .sidebar-btn[style*="borderLeft: 2px solid"] { background: rgba(244,239,230,0.09) !important; }
+
+        /* Cards */
+        .dash-card { position: relative; transition: transform .28s ease, box-shadow .3s ease, border-color .3s ease; }
+        .dash-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(26,22,19,0.05); }
+
+        /* Buttons */
+        .dash-root button { transition: transform .18s ease, opacity .18s ease, background-color .24s ease; }
+        .dash-root button:hover:not(:disabled) { transform: translateY(-1px); }
+        .dash-root button:active { transform: translateY(0); }
+
+        /* Progress */
+        .dash-progress { background: rgba(255,255,255,0.08); border-radius: 999px; height: 8px; overflow: hidden; }
+        .dash-progress-fill { height: 100%; background: ${SAGE_DARK}; transition: width .9s ease; }
+
+        /* Calendar */
+        .calendar-day { transition: background .22s ease, opacity .22s ease, transform .22s ease; }
+        .calendar-day:hover { background: rgba(244,239,230,0.03); transform: translateY(-2px); }
+        .calendar-day[style*="background: rgba(139,149,121,0.08)"] > div:first-child { background: ${DARK}; color: ${CREAM} !important; }
+
+      `}</style>
       <div className="flex pt-[72px] min-h-screen">
         {/* ── SIDEBAR ─────────────────────────────────────────────────────── */}
         <aside
@@ -985,7 +1028,7 @@ export default function Dashboard() {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className="w-full flex items-center gap-4 px-5 py-3.5 text-left transition-all duration-200 relative"
+                  className="w-full flex items-center gap-4 px-5 py-3.5 text-left transition-all duration-200 relative sidebar-btn"
                   style={{
                     background: isActive
                       ? "rgba(244,239,230,0.07)"
@@ -993,7 +1036,7 @@ export default function Dashboard() {
                     borderLeft: `2px solid ${isActive ? GOLD : "transparent"}`,
                     color: isActive ? CREAM : "rgba(244,239,230,0.52)",
                     fontSize: "11px",
-                    letterSpacing: "0.16em",
+                    letterSpacing: "0.08em",
                     textTransform: "uppercase",
                   }}
                   onMouseEnter={(e) => {
@@ -1122,9 +1165,17 @@ export default function Dashboard() {
                   <div className="flex items-center gap-4">
                     <div
                       className="px-3 py-2"
-                      style={{ background: CREAM_2, fontSize: "16px" }}
+                      style={{ background: CREAM_2, width: 28, height: 28 }}
                     >
-                      🔄
+                      <div
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: "50%",
+                          background: SAGE_DARK,
+                          margin: "8px auto",
+                        }}
+                      />
                     </div>
                     <div>
                       <p
@@ -1219,7 +1270,7 @@ export default function Dashboard() {
                     Profile editing is only allowed until 5:00 PM daily.
                   </div>
                 )}
-                <div style={{ ...card, padding: "2rem" }}>
+                <div className="dash-card" style={{ ...card, padding: "2rem" }}>
                   <div
                     style={{
                       display: "grid",
@@ -1445,8 +1496,8 @@ export default function Dashboard() {
                       </p>
                     </div>
                   </div>
-                  <div style={progressBarOuter}>
-                    <div style={progressFill(pct)} />
+                  <div className="dash-progress" style={progressBarOuter}>
+                    <div className="dash-progress-fill" style={{ width: `${pct}%` }} />
                   </div>
                   <p
                     style={{
@@ -1485,7 +1536,7 @@ export default function Dashboard() {
                   }}
                 >
                   {/* Pause card */}
-                  <div style={{ ...card, padding: "1.75rem", marginBottom: 0 }}>
+                  <div className="dash-card" style={{ ...card, padding: "1.75rem", marginBottom: 0 }}>
                     <div className="flex items-center gap-4 mb-5">
                       <div style={{ background: CREAM_2, padding: ".65rem" }}>
                         <Pause size={22} color={GOLD} strokeWidth={1.5} />
@@ -1543,7 +1594,7 @@ export default function Dashboard() {
                     >
                       <div
                         style={{
-                          background: `linear-gradient(90deg,${GOLD},#f4d03f)`,
+                          background: SAGE_DARK,
                           height: "100%",
                           width: `${maxPauseCount ? Math.round((usedPauseCount / maxPauseCount) * 100) : 100}%`,
                           transition: "width 1s ease",
@@ -1614,7 +1665,7 @@ export default function Dashboard() {
                   </div>
 
                   {/* Delivery slot card */}
-                  <div style={{ ...card, padding: "1.75rem", marginBottom: 0 }}>
+                  <div className="dash-card" style={{ ...card, padding: "1.75rem", marginBottom: 0 }}>
                     <div className="flex items-center gap-4 mb-5">
                       <div style={{ background: CREAM_2, padding: ".65rem" }}>
                         <Clock size={22} color={SAGE_DARK} strokeWidth={1.5} />
@@ -1705,7 +1756,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Package details */}
-                <div style={{ ...card, padding: "1.75rem" }}>
+                <div className="dash-card" style={{ ...card, padding: "1.75rem" }}>
                   <div style={labelStyle} className="mb-5">
                     — Package Details
                   </div>
@@ -1766,7 +1817,7 @@ export default function Dashboard() {
 
                 {/* Pause history */}
                 {subscription.pause?.history?.length > 0 && (
-                  <div style={{ ...card, padding: "1.75rem" }}>
+                  <div className="dash-card" style={{ ...card, padding: "1.75rem" }}>
                     <div style={labelStyle} className="mb-5">
                       — Pause History
                     </div>
@@ -2045,14 +2096,15 @@ export default function Dashboard() {
                           return (
                             <div
                               key={index}
+                              className="calendar-day"
                               style={{
-                                minHeight: 100,
-                                padding: "8px 6px 6px",
+                                minHeight: 108,
+                                padding: "10px 8px 8px",
                                 borderRight: `1px solid ${CARD_BORDER}`,
                                 borderBottom: `1px solid ${CARD_BORDER}`,
                                 display: "flex",
                                 flexDirection: "column",
-                                gap: 4,
+                                gap: 6,
                                 background: isToday
                                   ? "rgba(139,149,121,0.08)"
                                   : afterEnd
@@ -2136,7 +2188,7 @@ export default function Dashboard() {
                                             letterSpacing: "0.06em",
                                           }}
                                         >
-                                          ✓ Done
+                                          Done
                                         </span>
                                       )}
                                       {isToday && (
@@ -2247,7 +2299,7 @@ export default function Dashboard() {
                 >
                   All your transactions and receipts
                 </p>
-                <div style={{ ...card, padding: 0, overflow: "hidden" }}>
+                <div className="dash-card" style={{ ...card, padding: 0, overflow: "hidden" }}>
                   {transactions.length === 0 && (
                     <p
                       style={{
@@ -2466,7 +2518,7 @@ export default function Dashboard() {
                           const isUpgrade = rank > currentRank;
                           const isDowngrade = rank < currentRank;
                           const badge = isCurrent
-                            ? "✓ Current Plan"
+                            ? "Current Plan"
                             : isUpgrade
                               ? "↑ Upgrade"
                               : "↓ Downgrade";
@@ -2535,10 +2587,10 @@ export default function Dashboard() {
                       fontSize: ".9rem",
                     }}
                   >
-                    📧 customersupport@ryviveroots.com
+                    customersupport@ryviveroots.com
                   </p>
                   <p style={{ margin: 0, color: INK, fontSize: ".9rem" }}>
-                    📞 +91 97656 00701
+                    +91 97656 00701
                   </p>
                 </div>
 
@@ -2603,7 +2655,7 @@ export default function Dashboard() {
                 <div style={labelStyle} className="mb-4">
                   — Your Tickets
                 </div>
-                <div style={{ ...card, padding: 0, overflow: "hidden" }}>
+                <div className="dash-card" style={{ ...card, padding: 0, overflow: "hidden" }}>
                   {tickets.map((ticket, i) => (
                     <div
                       key={ticket.id}
@@ -2694,11 +2746,6 @@ export default function Dashboard() {
                   : isExpiringSoon
                     ? `Your subscription expires in ${daysLeft} day${daysLeft !== 1 ? "s" : ""} on ${endDateObj.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}. Renew soon!`
                     : `Your RYVIVE ${basePlan} plan renews on ${endDateObj.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}.`;
-                const renewalIcon = isExpiredLocal
-                  ? "⚠️"
-                  : isExpiringSoon
-                    ? "🔴"
-                    : "🔄";
                 const renewalIconBg = isExpiredLocal
                   ? "rgba(198,40,40,0.1)"
                   : isExpiringSoon
@@ -2776,10 +2823,18 @@ export default function Dashboard() {
                             alignItems: "center",
                             justifyContent: "center",
                             flexShrink: 0,
-                            fontSize: 15,
                           }}
                         >
-                          {renewalIcon}
+                          <Bell
+                            size={16}
+                            color={
+                              isExpiredLocal
+                                ? "#c62828"
+                                : isExpiringSoon
+                                  ? "#c8860f"
+                                  : SAGE_DARK
+                            }
+                          />
                         </div>
                         <div style={{ flex: 1 }}>
                           <p
@@ -2858,10 +2913,9 @@ export default function Dashboard() {
                                 alignItems: "center",
                                 justifyContent: "center",
                                 flexShrink: 0,
-                                fontSize: 15,
                               }}
                             >
-                              📢
+                              <Bell size={15} color={SAGE_DARK} />
                             </div>
                             <div style={{ flex: 1 }}>
                               <p
@@ -2940,7 +2994,7 @@ export default function Dashboard() {
               }}
               onClick={() => setShowPauseModal(false)}
             >
-              ✕
+              Close
             </button>
             <div style={labelStyle} className="mb-2">
               — Pause Request
@@ -3076,7 +3130,7 @@ export default function Dashboard() {
               }}
               onClick={() => setShowRenewModal(false)}
             >
-              ✕
+              Close
             </button>
             <div style={labelStyle} className="mb-2">
               — Renew
@@ -3152,7 +3206,7 @@ export default function Dashboard() {
                           textTransform: "uppercase",
                         }}
                       >
-                        ⭐ Most Popular
+                        Most Popular
                       </div>
                     )}
                     <h4
@@ -3311,7 +3365,7 @@ export default function Dashboard() {
                   }}
                   onClick={() => setShowSummary(false)}
                 >
-                  ✕
+                  Close
                 </button>
                 <div style={labelStyle} className="mb-2">
                   — Summary
@@ -3405,10 +3459,10 @@ export default function Dashboard() {
                     lineHeight: 1.65,
                   }}
                 >
-                  🌿 <strong>Why renew now?</strong>
+                  <strong>Why renew now?</strong>
                   <br />
-                  Stay consistent, maintain your savings, and keep your wellness
-                  streak going.
+                  Maintain consistency, preserve savings, and continue your
+                  wellness ritual.
                 </div>
                 <button
                   style={{ ...btnDark, width: "100%" }}
@@ -3422,7 +3476,8 @@ export default function Dashboard() {
         })()}
 
       <style>{`
-        input[type="date"]:focus, textarea:focus, select:focus { border-color: ${GOLD} !important; outline: none; }
+        /* Minimal fallback styles while refining visuals */
+        input[type="date"]:focus, textarea:focus, select:focus { border-color: #d4af37 !important; outline: none; }
         button:not(:disabled):active { opacity: 0.8; }
       `}</style>
     </div>
